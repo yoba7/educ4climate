@@ -16,48 +16,6 @@ directory=r'/home/yoba/Projects/education4climate/education4climate/data/crawlin
 scoring_directory=r'/home/yoba/Projects/education4climate/education4climate/data/scoring-output'
 patterns_directory=r'/home/yoba/Projects/education4climate/education4climate/data/patterns/base'
 
-'''
-entities=[
-'artevelde',
-'ecam',
-'ecsedi-isalt',
-'ehb',
-'heaj',
-'hech',
-'he-ferrer',
-'heh',
-'heldb',
-'helmo',
-'hel',
-'henallux',
-'hepl',
-'hers',
-'hogent',
-'howest',
-'ichec',
-'ihecs',
-'ispg',
-'issig',
-'kuleuven',
-'odisee',
-'thomasmore',
-'uantwerpen',
-'ucll',
-'uclouvain',
-'ugent',
-'uhasselt',
-'ulb',
-'uliege',
-'umons',
-'unamur',
-'uslb',
-'vinci',
-'vives',
-'vub'
-    ]
-
-'''
-
 
 db_file=r'/home/yoba/Projects/education4climate/open-data/output/education4climate.sqlite'
 
@@ -65,7 +23,7 @@ os.remove(db_file)
 db=sqlite3.connect(db_file)
 
 def loadProgram(year,entity):
-    print(f'Entity-Program: {entity}')
+    print(f'Entity-Program: {year}-{entity}')
     
     program=pd.read_json(f'{directory}/{entity}_programs_{year}.json')
     program['entity']=entity
@@ -98,7 +56,7 @@ def loadProgram(year,entity):
 
 def loadCourse(year,entity):
     
-    print(f'Entity-Courses: {entity}')
+    print(f'Entity-Courses: {year}-{entity}')
 
     courses=pd.read_json(f'{directory}/{entity}_courses_{year}.json')
     courses['entity']=entity
@@ -127,7 +85,7 @@ def loadCourse(year,entity):
 def loadScoringResults(year,entity):
     # Scoring results
             
-    print(f'Scoring: {entity}')
+    print(f'Scoring: {year}-{entity}')
 
     scoring=pd.read_csv(f'{scoring_directory}/{entity}_courses_scoring_{year}.csv',sep=',')
     scoring['entity']=entity
@@ -139,7 +97,7 @@ def loadScoringResults(year,entity):
 def loadMatches(year,entity):
     # Matches
             
-    print(f'Matching: {entity}')
+    print(f'Matching: {year}-{entity}')
 
 
     with open(f'{scoring_directory}/{entity}_matches_{year}.json','r') as f:
@@ -170,9 +128,11 @@ for (entity, operation, year) in files:
 os.chdir(scoring_directory)
 
 
-scoringResultsFiles=[ file[0:-4].split('_') for file in glob.glob('*_courses_scoring_2022.csv')]
+scoringResultsFiles=[ file[0:-4].split('_') for file in glob.glob('*_courses_scoring_*.csv')]
 for (entity, _, _, year) in scoringResultsFiles:
-    loadScoringResults(year,entity)
+    # ATTENTION: FILTRE
+    if year in [2021,2022]:
+        loadScoringResults(year,entity)
     
 matchesFiles=[ file[0:-5].split('_') for file in glob.glob('*_matches_*.json')]
 for (entity, _, year) in matchesFiles:    
